@@ -1,91 +1,46 @@
 pipeline {
     agent any
 
-    environment {
-        function_name = 'java-sample'
-    }
-
     stages {
-
-        // CI Start
         stage('Build') {
             steps {
-                echo 'Build'
-                sh 'mvn package'
+                echo 'Building'
             }
         }
-
-
-        stage("SonarQube analysis") {
-            agent any
-
-            when {
-                anyOf {
-                    branch 'feature/*'
-                    branch 'main'
-                }
-            }
+        stage('Test') {
             steps {
-                withSonarQubeEnv('Sonar') {
-                    sh 'mvn sonar:sonar'
-                }
+                echo 'Testing'
             }
         }
-
-        stage("Quality Gate") {
+        stage('Sonar scanning') {
             steps {
-                script {
-                    try {
-                        timeout(time: 10, unit: 'MINUTES') {
-                            waitForQualityGate abortPipeline: true
-                        }
-                    }
-                    catch (Exception ex) {
-
-                    }
-                }
+                echo 'Scanning the quality of code'
             }
         }
-
-        stage('Push') {
+        stage('Publish to Artifactory') {
             steps {
-                echo 'Push'
-
-              //  sh "aws s3 cp target/sample-1.0.3.jar s3://bucketjeevu"
+                echo 'Publishing to Artifactory'
+            }
+        }    
+        stage('Deploy to Dev') {
+            steps {
+                echo 'Deploying to Dev'
             }
         }
-
-        // Ci Ended
-
-        // CD Started
-
-        stage('Deployments') {
-            parallel {
-
-                stage('Deploy to Dev') {
-                    steps {
-                        echo 'Build'
-
-                        //sh "aws lambda update-function-code --function-name $function_name --region us-west-1 --s3-bucket bucketjeevu --s3-key sample-1.0.3.jar"
-                    }
-                }
-
-                stage('Deploy to test ') {
-                    when {
-                        branch 'main'
-                    }
-                    steps {
-                        echo 'Build'
-
-                        // sh "aws lambda update-function-code --function-name $function_name --region us-west-1 --s3-bucket bucketjeevu --s3-key sample-1.0.3.jar"
-                    }
-                }
+        stage('Deploy to UAT') {
+            steps {
+                echo 'Deploying to UAT'
             }
         }
-
-
-        
-
-        // CD Ended
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Building'
+            }
+        }
+        stage('Deploy to Artifactory') {
+            steps {
+                echo 'Deploy to Artifactory'
+            }
+        }
     }
 }
