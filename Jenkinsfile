@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        function_name = 'functionforjava'
+        function_name = 'java-sample'
     }
 
     stages {
@@ -48,7 +48,7 @@ pipeline {
         stage('Push') {
             steps {
                 echo 'Push'
-                sh "aws s3 cp target/sample-1.0.3.jar s3://bucket001306"
+                sh "aws s3 cp target/sample-1.0.3.jar s3://bucketjeevu"
             }
         }
 
@@ -58,3 +58,6 @@ pipeline {
                     steps {
                         echo 'Deploy to Dev'
                         sh "aws lambda update-function-code --
+                    }
+                }
+            
